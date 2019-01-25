@@ -33,20 +33,14 @@ abstract class SetType extends Type {
     public function convertToDatabaseValue($value, AbstractPlatform $platform) {
 
         if (empty($value)) {
-
             return null;
         } elseif (!is_array($value)) {
-
             throw new InvalidArgumentException('Error "' . $this->getName() . '" type, "' . $value . '" must be array.');
         }
 
         foreach ($value as $item) {
-
-            if (in_array($item, $this->getValue())) {
-
+            if ($this->isValid($item))
                 continue;
-            }
-
             throw new InvalidArgumentException('Invalid "' . $this->getName() . '" type, "' . $item . '" not allowed.');
         }
 
@@ -70,12 +64,7 @@ abstract class SetType extends Type {
      * {@inheritdoc}
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
-
-        $allow = array_map(function ($type) {
-            return '\'' . $type . '\'';
-        }, $this->getValue());
-
-        return 'SET ( ' . implode(',', $allow) . ' )';
+        return 'TEXT';
     }
 
     /**
@@ -83,5 +72,11 @@ abstract class SetType extends Type {
      */
     public function requiresSQLCommentHint(AbstractPlatform $platform) {
         return true;
+    }
+
+
+    protected function isValid($item)
+    {
+        return in_array($item, $this->getValue());
     }
 }
