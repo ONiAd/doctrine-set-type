@@ -64,7 +64,10 @@ abstract class SetType extends Type {
      * {@inheritdoc}
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
-        return 'TEXT';
+        $allow = array_map(function ($type) {
+            return '\'' . $type . '\'';
+        }, $this->getValue());
+        return 'SET ( ' . implode(',', $allow) . ' )';
     }
 
     /**
